@@ -1,0 +1,82 @@
+K8S 单etcd搭建
+===
+在网上看一篇技术资料，etcd可以不用集群模式，可以使用单etcd模式，这样稳定性更好更容易搭建.
+
+*  1、出现问题：etcd server 和node 时间不同步问题，无论是单节点etcd还是集群etcd 都需要时间同步，否则etcd server 一直会报错，搭建个ntp server ，所有主机时钟同步到这台服务器，问题解决。
+*  2、跟etcd集群模式设置的不同，
+
+>    1. k8s集群中只有一台host装etcd即可，或者将etcd单独在k8s集群之外单独的etcd服务器或者集群。
+>    2. 创建flannel.conf   参数FLANNELD_ETCD_ENDPOINTS=http://192.168.100.160:2379  就只填写这一台etcd即可，每台都这样设置
+>    3. master 主机的apiserver 文件KUBE_ETCD_SERVERS="--etcd-servers=http://192.168.100.160:2379"   就这一台etcd
+
+
+
+一、架构
+---
+master  Ubuntu16.04  192.168.3.160
+node1  Ubuntu16.04   192.168.15.160
+node2  Ubuntu16.04   192.168.15.161
+node2  Opensuse42.1  192.168.0.161
+
+二、安装配置etcd
+---
+略
+
+三、安装flannel
+---
+由于flannel目前在ubuntu上面没有apt直接安装包，所以必须创建.service 文件
+
+``` shell
+https://github.com/coreos/flannel/releases    #下载并解压
+将 flanneld  mk-docker-opts.sh  这两个文件放在/usr/local/bin/  目录里面
+创建flannel.service
+ii.配置桥接网段
+etcdctl set /coreos.com/network/config  '{ "Network": "10.1.0.0/16", "Backend": { "Type": "vxlan", "VNI": 1 } }'
+iii.启动flanneld(所有Minion节点)
+flanneld  -iface=eno16777728  -subnet-file=/etc/profile.d/flanneld.env -etcd-endpoints=http://192.168.3.167:2379,http://192.168.3.168:2379,http://192.168.8.160:2379  #对外网口名称
+
+iv.systemd管控
+1.创建flanneld.service
+cat >/lib/systemd/system/flanneld.service <<'HERE'
+[Unit] 
+Description=Flannel Server
+After=network.target
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+EnvironmentFile=/etc/flanneld.conf
+ExecStart=/usr/local/bin/flanneld  -subnet-file=/etc/profile.d/flanneld.env -etcd-endpoints=${FLANNELD_ETCD_ENDPOINTS}
+Restart=on-failure
+LimitNOFILE=1000000 
+[Install]
+WantedBy=multi-user.target
+HERE 
+2.创建主配置文件flanneld.conf 
+cat >/etc/flanneld.conf <<HERE
+FLANNELD_ETCD_ENDPOINTS=http://192.168.8.160:2379,http://192.168.8.161:2379
+HERE 
+3.测试systemd启动flanneld 
+[root@node4 ~]# systemctl enable flanneld
+Created  symlink from /etc/systemd/system/multi-user.target.wants/flanneld.service  to /usr/lib/systemd/system/flanneld.service. 
+[root@node4 ~]# systemctl restart flanneld
+[root@node4 ~]# systemctl status flanneld 
+1.集群服务中的docker要监听在tcp端口，-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock
+2.需要指定桥接网络
+修改docker.service启动参数
+EnvironmentFile=/etc/profile.d/flanneld.env
+ExecStart=/usr/bin/dockerd ---insecure-registry 192.168.18.250:5002 -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --bip=${FLANNEL_SUBNET} --mtu=${FLANNEL_MTU} 
+#apt  -y install bridge-utils
+systemctl daemon-reload
+systemctl restart docker
+systemctl enable docker 
+提示: docker指定flannel桥接网络后，docker宿主机上的容器就可以实现跨主机通信，实际上是修改了docker原生docker0的地址
+安装好以后在集群内ping 不同node的docker0地址，是否能ping 通
+常见故障：集群内主机时间不一致，会造成etcd 超时报错，同步时钟
+docker 起不来，查看lib/systemd/system/doctor.service 配置文件，参数不对
+```
+
+参考资料
+----
+- [在Ubuntu16.04集群上手工部署Kubernetes] http://blog.csdn.net/linuxgo/article/details/52105068

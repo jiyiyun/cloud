@@ -1,0 +1,20 @@
+[Unit]
+Description=Kubernetes Kubelet
+After=docker.service
+Requires=docker.service
+
+[Service]
+ExecStart=/opt/bin/kubelet \
+  --node-ip=kube-host-IP \
+  --address=0.0.0.0 \
+  --port=10250 \
+  --log-dir=/opt/kubernetes/server/log \
+  --api-servers=http://kube-server-IP:8080 \
+  --configure-cbr0=false
+  --hostname-override=kube-host-IP \
+  --logtostderr=true
+Restart=on-failure
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
