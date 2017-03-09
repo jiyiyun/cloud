@@ -17,7 +17,7 @@ etcd配置we文件默认路径
 ```txt
 [root@master ~]# systemctl start docker
 ```
-4 . 每个节点使用kubeadm reset 命令重置系统
+4 . 每个节点使用kubeadm reset 命令重置系统(这步最重要)
 
 ```txt
 [root@master ~]# kubeadm reset
@@ -33,8 +33,10 @@ etcd配置we文件默认路径
 ```txt
 [root@master ~]# kubeadm init --use-kubernetes-version v1.5.1 --api-advertise-addresses=192.168.100.34 --pod-network-cidr 10.1.0.0/16
 ```
+经验：一定要用kubeadm reset来清理系统，否则容器会不断生成
 
 备注：
+
 - etcd 是存储K8s整个系统所有配置文件的，把这个目录删了，系统就不知道创建pod、Service、namespace等所有的配置信息了
 
 - kubelet 是master 和node节点通讯的关键，停掉后node和master就失去通讯
