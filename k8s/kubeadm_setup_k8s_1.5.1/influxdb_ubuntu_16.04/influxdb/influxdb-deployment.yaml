@@ -16,7 +16,7 @@ spec:
         emptyDir: {}
       containers:
       - name: influxdb
-        image: 192.168.100.38:5002/google_containers/heapster_influxdb:v0.5
+        image: gcr.io/kubernetes/heapster_influxdb:v0.5
         volumeMounts:
         - mountPath: /data
           name: influxdb-storage

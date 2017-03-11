@@ -14,9 +14,9 @@ spec:
     spec:
       containers:
       - name: heapster
-        image: 192.168.100.38:5002/google_containers/heapster:v1.1.0
+        image: gcr.io/kubernetes/heapster:canary
         imagePullPolicy: Always
         command:
         - /heapster
-        - --source=kubernetes:http://192.168.100.35:8080?inClusterConfig=false&useServiceAccount=true&auth=
+        - --source=kubernetes:http://kube-server:8080?inClusterConfig=false&useServiceAccount=true&auth=
         - --sink=influxdb:http://monitoring-influxdb:8086

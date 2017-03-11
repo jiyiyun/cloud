@@ -1,0 +1,17 @@
+[Unit]
+Description=Kubernetes Scheduler
+Documentation=https://github.com/kubernetes/kubernetes
+
+[Service]
+User=root
+ExecStart=/opt/bin/kube-scheduler \
+  --address=0.0.0.0 \
+  --port=10251 \
+  --log-dir=/opt/kubernetes/server/log \
+  --logtostderr=true \
+  --master=kube-server-IP:8080
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
