@@ -1,0 +1,30 @@
+dockerfile写法
+
+FROM                        源镜像
+
+MAINTAINER  <>              作者
+
+RUN                         docker 会将该指令翻译为 "/bin/sh -c "xxx" 其中XXX 为RUN后面的shell命令
+RUN <command> 
+RUN ["executable","param1","param2" ......]
+
+EXPOSE <port>[<port>...]    将容器端口暴露出来，也可以通过docker run -p 实现端口映射
+
+CMD                          指定启动容器时执行的命令，每个Dockerfile只能有一条CMD命令，
+                             如果指定了多条只有最后一条CMD命令被执行，如果用户启动容器的时候指定了运行命令
+                             则会覆盖掉CMD命令
+CMD ["executable","param1","param2"]        使用exec执行，推荐方式
+CMD command param1 param2                   在/bin/sh 中执行，提供给需要交互的应用
+CMD ["param1","param2"]                     提供给ENTRYPOINT的默认参数
+
+ENTRYPOINT                   每个dockerfile 只能有一个ENTRYPOINT，指定多个时最后一个有效
+ENTRYPOINT ["executable","param1","param2"]
+ENTRYPOINT command param1 param2
+
+VOLUME ["/data"]              创建一个挂载点，一般存放需要永久保留的数据
+
+ENV <key><value>              指定一个环境变量，会被后续RUN指令使用，并在容器运行时保持
+
+ADD <src><dest>              该指令将复制指定<src> 到容器的<dest> ,<src> 可以为相对路径，也可以为www,tar文件
+
+COPY <src><dest>              复制本地主机的<src>（为Dockerfile所在目录的相对路径）到容器的<dest>
