@@ -151,3 +151,78 @@ eth1   eth2        eth1   eth2           eth1   eth2       eth1  eth2
                             ---------------------------------------|
                                       Data 192.168.10.0/24
 ```
+OpenStack中的MQ
+
+服务内组件之间的消息全部通过MQ来进行转发，包括控制、查询、监控指标等
+
+```txt
+Nova-api       --------    ------ Cinder-volume
+Nova-compute   -------- MQ ------ Cinder-api
+Nova-conductor --------    ------ Neutron-agent,Neutron-server
+```
+RabbitMQ工作流程
+```txt
+                   RabbitMQ
+Producer--------Exchange---------------Queue---Push-----------Cusumer
+消息生产者，投递   消息交换机，指定消息按什   消息队列载体，每个消息都  消息消费者，接受
+消息的程序        么规则，路由到哪个队列     被投入到一个或多个队列    消息的程序
+```
+Exchange类型
+- Fanout:广播到所有该exchange bind的queue
+- Topic:表达式匹配(#表示0或者多个word,*表示一个word)
+- Direct:route key 完全匹配
+
+基于OpenStack的华为FusionSphere
+===
+
+```txt
+应用   CRM  ERP  办公系统 ...                            数据中心管理平台ManageOne
+
+             基础设施云平台FusionSphere                                    云管理
+     |-------------OpenStack-------------------------------------------|OpenStack OM
+     | keystone                                             Heat       |
+基础设| Glance   Nova          Cinder        Neutron         Ceilometer |
+施服务| Swift    Nova-compute  Cinder-volume Neutron Plug-in Ironic     |
+     |          Driver        Driver                                   |
+     |-----------------------------------------------------------------|
+虚拟资源     VM  VM VM
+               UVP
+物理资源    x86服务器、存储、网络、物理设备
+```
+基于OpenStack的FusionSphere基础设施云平台，从功能上分为OpenStack、 FusionCompute、 FusionStorage、 FusionNetwork、 OpenStack OM几大部分
+
+兼容性和开放接口
+```txt
+      开放的API                      云管理SDK
+虚拟机管理    虚拟内存管理        虚拟机管理       业务编排
+虚拟快照管理  虚拟网络管理        虚拟存储管理     平台能力插件
+VPC管理      虚拟防火墙管理      虚拟网络管理      集成工作流
+
+OpenStack原生北向服务接口                 OpenStack原生南向插件
+```
+华为OpenStack企业版基于OpenStack社区版进行商用加固
+```txt
+            Huawei OpenStack Distribution                    商用加固
+               FusionSphere OpenStack                        易部署，易运维
+OpenStack      OpenStack Extension(Plugin/Driver/Extension)  高可靠，安全加固
+Common Service (Install,upgrade,monitor,Alarm,Log,HA)        自动化，扩展性
+```
+FusionSphere OpenStack商用加固
+```txt
+OpenStack OM (应用监控与告警(AM&FM)  Web Portal 用户管理 异构硬件适配 安全(IAM)管理)
+OpenStack    (Nova Cinder Neutrun Keystone Glance Swift Heat Ceilometer Ironic)
+          Nova-compute Driver      Cinder-volume Driver  Neutron Plugin    
+          计算虚拟化 |                 存储虚拟化 |           网络虚拟化 |
+          FusionCompute             FusionStorage        FusionNetwork
+        集群调度、高级扩展性          存储卸载 存储高级特性    SDN控制器，虚拟服务网关
+                HA热迁移              瘦分/快照/灾备...              vFW/vLB
+          虚拟化平台UVP               分布式存储引擎             虚拟交换机(EVS)
+
+                          基础OS安装、管理节点发放
+       云启动服务(CBS)            云发放服务(CPS)
+```
+1. FusionStorage ---- 高性能存储加速IO;高性能分布式存储；可扩展性：超大存储池
+2. FusionCompute ---- Hypervisor:支持FusionCompute虚拟平台接入；高性能、高可靠和易维护
+3. 云启动服务(CBS) ---- 高可用性商用部署框架 一键式无损升级，硬件即插即用，故障自动恢复
+4. 云发放服务(CPS) ---- 图形化安装 提供图形化安装界面，简化OpenStack安装提升安装效率
+
