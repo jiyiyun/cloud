@@ -19,10 +19,11 @@ OpenStack不是云
 
 OpenStack服务简介
 
-- 服务                   项目名称    描述
-- Block Storage         Cinder     为运行实例而提供的持久性块存储，可插拔驱动架构有助于创建和管理块存储设备
-- Identity Service      Keystone   为其它服务提供认证和授权服务，为所有服务提供一个端点目录
-- Image Service         Glance     存储和检索虚拟机磁盘镜像，实例部署时使用此服务
-- Telemetry Service     Ceilometer 计费、基准、拓展性以及统计等目的提供检测和计量
-- Orchestration Service Heat       即可使用本地模板，也可以使用AWS CloudFormation模板格式编排多个综合的云应用
-
+服务                   项目名称    描述
+```txt
+Block Storage         Cinder     为运行实例而提供的持久性块存储，可插拔驱动架构有助于创建和管理块存储设备
+Identity Service      Keystone   为其它服务提供认证和授权服务，为所有服务提供一个端点目录
+Image Service         Glance     存储和检索虚拟机磁盘镜像，实例部署时使用此服务
+Telemetry Service     Ceilometer 计费、基准、拓展性以及统计等目的提供检测和计量
+Orchestration Service Heat       即可使用本地模板，也可以使用AWS CloudFormation模板格式编排多个综合的云应用
+```
