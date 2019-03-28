@@ -76,5 +76,57 @@ VXLAN是MAC in UDP的网络虚拟化技术，所以其报文封装是在原始�
 | Ethernet |  IP   | UDP   | header| Ethernet |  IP    |          |
 |  header  | header| header|       | header   | header |          |
 -------------------------------------------------------------------
-
+                       |       |
+                       |       v
+                       |      8 bits       24 bits  24 bits  8 bits
+                       |  ----------------------------------------------
+                       |  | VXLAN Flags | Reserved |  VNI   | Reserved | 8 bytes
+                       |  | (00001000)  |          |        |          |
+                       v  ----------------------------------------------
+    16 bits    16 bits      16 bits   16 bits 
+   ---------------------------------------------
+   | Source | DestPort     | UDP    | UDP      |
+   | Port   | (VXLAN Port) | length | checksum |8 bytes
+   ---------------------------------------------
 ``` 
+VTEP概念
+- VXLAN网络中的NVE以VTEP进行标示，VTEP(VXLAN Tunnel EndPoint,VXLAN隧道端点)
+- 每一个NVE至少有一个VTEP，VTEP使用NVE的IP地址表示
+- 两个VTEP可以确定一条VXLAN隧道，VTEP间的这条VXLAN隧道将被两个NVE间所有VNI共用
+```txt
+                NVE3   VNI1
+                 |     VNI2
+    VLAN tunnel  |
+NVE2------------NVE1------------NVE4
+                 |     VNI1
+                 |     VNI2
+                NVE5
+ VTEP 必须全网唯一
+```
+隧道和VNI关系
+```txt
+VTEP 1.1.1.1                                   VTEP2 1.1.1.2
+VNI----------------------------------------------VNI
+                     vxlan tunnel
+VNI----------------------------------------------VNI
+```
+VNI概念
+- 标示VXLAN网络中的二层域
+- 两个VTEP可以确定一条VXLAN隧道，VTEP间的这条VXLAN隧道被两个NVE间的所有NVI共用
+
+VXLAN转发数据封装
+```txt
+A<------>Ingress NVE<------>Transit<------>Egree NVE<------>B
+    端到端不变VTEP IP            逐跳改变外层MAC
+```
+源终端的二层报文能够穿越IP网络到达目的终端，VXLAN网络对于主机来说相当于是Bridge Fabric
+
+VXLAN主要优点
+
+- 网络依赖小 基于IP的overlay，仅需要边界设备间IP可达 
+- 环路避免 隧道间水平分割、IP overlay TTL避免环路
+- 高效转发 数据流量基于IP路由SPF及ECMP快速转发
+- 快速收敛 网络变化实时侦听全网拓扑毫秒收敛
+- 虚拟化 overlay+VNI构建虚拟网络，支持多达16M的虚拟网络
+- 部署灵活网络 物理设备、vSwitch均能够部署
+
