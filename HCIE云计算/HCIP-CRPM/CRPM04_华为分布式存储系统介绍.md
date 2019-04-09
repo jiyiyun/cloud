@@ -42,5 +42,63 @@ Storage Pools
 - FusionStorage采用的DHT算法有以下特点：
 
 > 均衡性：数据能够尽可能分布到所有节点中，这样可以使得所有节点负载均衡
+
 > 单调性：当有新节点加入大系统中，系统会重新做数据分配，数据迁移仅涉及新增节点，现有节点上数据不需要做很大调整
+
+华为Server SAN产品FusionStorage
+
+分布式块存储软件 将通用x86服务器的本地HDD、SSD等介质通过分布式技术组织成大规模存储资源池；对非虚拟化环境的上层应用和虚拟机提供工业界标准的SCSI和iSCSSI接口，开放的API
+
+- 支持传统块存储典型应用场景 各种业务应用(如SQL,Oracle RAC 、Web 行业应用等)
+- 主流云平台集成 可以和各种云平台集成。如华为FusionSphere 、VMWare、开源Openstack等，按需分配存储资源
+- 商用支持PB级Server SAN产品
+
+华为FusionStorage两大主要应用场景
+```txt
+云资源池    数据库及关键应用
+
+虚拟化平台
+
+SCSI /iSCSI
+
+FusionStorage
+```
+- 开发兼容 兼容主流数据库，兼容虚拟化平台，兼容主流服务器
+- 融合部署 支持虚拟化平台和数据库资源池融合部署，即共用一个数据中心FusionStorage存储资源池
+- FusionStorage支持使用SSD替代HDD作为高速存储设备，支持使用InfiniBand网络替代 GE/10GE网络提供更高带宽，对性能要求极高的大数据量实时处理场景提供完美的支持千万级IOPS
+
+FusionStorage逻辑架构
+```txt
+            VM1                    VM2
+     FusionStorage(master)  FusionStorage(Standby)
+服务器1                 服务器2              服务器3              服务器4
+FusionStorage agent    FusionStorage agent FusionStorage agent FusionStorage agent
+MDC  VBS               VBS                 VBS
+OSD  OSD               OSD  OSD                                OSD
+管理计算存储节点         计算存储节点           计算节点             存储节点
+```
+- FSM(FusionStorage Manager) FusionStorage管理模块，提供告警、监控、日志、配置等操作维护功能。一般情况下FSM主备节点部署
+- FSA(FusionStorage Agent) 代理进程，部署在各个节点上，实现各个节点与FSM通信，FSA包含MDC，VBS，和OSD三种不同进程。根据系统不同配置要求，分别在不同节点上启用不同进程组合来完成特定的功能
+
+FusionStorage有分离部署和融合部署模式  分离模式计算节点服务器3和存储节点服务器4 ；融合模式服务器2；两种模式下管理节点都至少需要3台
+
+- MDC(MetaData Controller)元数据控制，实现分布式集群的状态控制，以及控制数据分布式规则、数据重建规则等。MDC默认部署在3个节点的ZK(Zookeeper)盘上，形成MDC集群。
+- VBS(Virtual Block System) 虚拟块存储管理软件，负责卷元数据的管理，提供分布式集群接入点服务，使计算资源能够通过VBS访问分布式存储资源。每个节点默认部署一个VBS进程，形成VBS集群。节点上也可以通过部署多个VBS来提升IO性能
+- OSD(Object Storage Device) 对象存储设备服务，执行具体的I/O操作，在每个服务器上部署多个OSD进程，一块磁盘默认对应部署一个OSD进程，在SSD卡作为主存储时，为了充分发挥SSD性能，可以在一块SSD卡上部署多个OSD进程进行管理
+
+主存 FusionStorage用服务器的数据存储磁盘
+
+FusionStorage部署方式
+- 融合部署 指将VBS和OSD部署在同一台服务器中，虚拟化应用推荐采用融合部署方式部署
+- 分离部署 将VBS和OSD分别部署在不同的服务器中 高性能数据库应用推荐采用分离部署方式
+
+基础概念
+
+资源池  FusionStorage中一组硬盘构成的存储池
+Volume卷 应用卷，代表了FusionStorage向上层呈现的一个逻辑存储单元
+
+
+
+
+
 
