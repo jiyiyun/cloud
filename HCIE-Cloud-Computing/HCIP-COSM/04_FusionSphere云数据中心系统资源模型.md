@@ -1,0 +1,20 @@
+1. region：更像地理上的概念，每个region有自己的endpoint，reguons之间完全隔离，但是多个regions之间共享一个keystone和Dashboard
+除了提供隔离功能，region的设计更多侧重地理概念，用户可以选择离自己更近的region来部署自己的服务
+2. Availability Zone： AZ简单理解为一组节点的集合，这组节点有独立的电力供应设备，AZ主要通过冗余来解决可用性问题
+AZ是一个用户可见的概念，用户在创建instance的时候可以选择创建到哪些AZ中，保证instance的可用性
+
+3. Host Aggregate  AZ是一个面向用户的概念和能力，而host aggregate是管理员用来根据硬件资源的某一属性来对硬件进行划分的功能，只对管理员可见，主要用来给nova-scheduler通过某一属性来进行instance的调度。其主要功能就是实现根据某一属性来划分物理机，比如按照地理位置，使用固态硬盘的机器，根据这些指标来构成一个host group
+
+cell是OpenStack中一个非常重要的概念，主要解决OpenStack的扩展性和规模瓶颈。OpenStack是由很多组件通过松耦合构成，当达到一定规模后，这些模块必然成为整个系统的瓶颈，典型的组件就是database和AMQP了，每个cell有自己独立的DB和AMQP
+
+父cell通过nova-cell将Message路由到子cell的AMQP模块
+
+分级调度功能，即调度某个instance的时候先要进行cell的选择，目前只支持随机调度，后续增加基于fulter和weighing策略的调度
+
+资源统计 子cell定时将自己信息上报给父cell，用来给分级调度策略提供决策数据和基于cell的资源监控
+
+cell之间通信通过RPC(Remote Producer Call)完成，https://www.ibm.com/developerworks/cn/cloud/library/1403_renmm_opestackrpc/
+
+所有子cell公用底层cell的nova-api,子cell包含除了nova-api之外的其它nova服务，当然所有cell都共用keystone服务
+
+

@@ -193,9 +193,27 @@ KVM场景下使用阵列时挂卷流程
 
 
 
-2. Nova服务原理与虚拟机创建流程
-===
+裸金属服务(Ironic)的服务架构
 
+| 模块               | 功能 | 一般部署位置 |
+|:------------------:|:------------------------------------|:----------------------|
+|ironic-api          |接受rest消息                         |控制节点|
+|ironic-conductor    |Ironic最主要的服务模块                |控制节点|
+|nova-compute-ironic |负责nova与Ironic服务的交互            |控制节点|
+|ironic-provision    |提供裸金属安装过程的tftp服务          |控制节点|
+|ironic-python-agent |与conductor交互，执行conductor下发命令|裸金属节点(仅启动过程存在)|
+|ironic-db           |数据库，存储Ironic管理信息|控制节点|
 
-3. Ironic服务原理与裸金属实例申请流程
-===
+裸金属实例申请过程
+1. 用户在申请裸金属过程中，需要指定模板(裸金属模板)、镜像、网络申请裸金属，nova-api收到请求传递消息到nova-schduler
+2. nova-schduler通过模板和裸金属硬件信息进行调度，调度成功后将请求发放到nova-compute-ironic上
+3. nova-compute-ironic启动创建任务，通知neutron为裸金属实例准备网络
+4. 裸金属节点的信息存入数据库，并锁定裸金属节点
+5. nova-compute调用创建虚拟机租户网络配置并发送信息到irionic-api,请求ironic进行裸金属部署
+6. ironic-api传递消息到ironic-conductor,conductor推送miniOS到软件仓库并生成裸金属节点的PXE配置
+7. ironic-conductor完成裸金属节点的pxe和ipxe配置，通知neutron切换裸金属网络到provision安装平面，在provision安装平面完成裸金属pxe启动过程安装的dhcp
+8. ironic-conductor设置裸金属的启动方式为pxe启动
+9. ironic-conductor通过ipmi命令启动裸金属，进入pxe加载miniOS流程
+10. 裸金属pxe加载miniOS后，启动ironic-python-agent,与ironic-conductor交互，完成裸金属guestOS镜像的下载并写入到系统本地磁盘
+11. 安装镜像完成后，ironic-conductor调用neutron接口，切换裸金属的网络到租户网络，重启裸金属并完成guestOS的安装
+12. 裸金属发放完成，更新裸金属节点的状态为active
