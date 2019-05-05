@@ -3,6 +3,7 @@
 ---
 - https://code.vmware.com/web/tool/6.7/vsphere-cli
 - https://blog.51cto.com/20161215/1852260
+- https://www.cnblogs.com/frostx/p/3705942.html
 
 1. 获取ESXI 服务器IP
 ```txt
@@ -167,6 +168,43 @@ VMkernel exi116 5.5.0 #1 SMP Release build-3248547 Nov 17 2015 21:38:51 x86_64 G
 Sun May  5 10:13:33 UTC 2019
 ~ # date +%D
 05/05/19
+
+~ # esxcli system hostname get
+   Domain Name: 
+   Fully Qualified Domain Name: exi116
+   Host Name: exi116
+~ # hostname
+exi116
+```
+
+查看虚拟机情况
+---
+```txt
+~ # esxcli vm process --help
+Usage: esxcli vm process {cmd} [cmd options]
+
+Available Commands:
+  kill                  Used to forcibly kill Virtual Machines that are stuck and not responding to normal stop
+                        operations.
+  list                  List the virtual machines on this system. This command currently will only list running
+                        VMs on the system.
+~ # esxcli vm process list
+server08R2
+   World ID: 107654
+   Process ID: 0
+   VMX Cartel ID: 107651
+   UUID: 56 4d c4 d7 de eb 77 81-dc 69 4e 96 d4 c6 18 4f
+   Display Name: server08R2
+   Config File: /vmfs/volumes/5cc5b591-875b0190-c587-001871eaca38/server08R2/server08R2.vmx
+
+CentOS7.6_mini
+   World ID: 1454883
+   Process ID: 0
+   VMX Cartel ID: 1454882
+   UUID: 42 3b ae dc 54 36 d8 e3-9d d6 f1 e0 ab a0 5c ca
+   Display Name: CentOS7.6_mini
+   Config File: /vmfs/volumes/5cc5b591-875b0190-c587-001871eaca38/CentOS7.6_mini/CentOS7.6_mini.vmx
+~ # 
 ```
 
 登录EXSI 查看内存
