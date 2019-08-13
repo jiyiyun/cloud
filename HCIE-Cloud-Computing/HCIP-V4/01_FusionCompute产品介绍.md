@@ -31,6 +31,15 @@ FusionSphere服务器虚拟化架构
 - UltraVR:提供跨站点容灾能力
 - eBackup:提供虚拟机的备份能力
 
+FusionSphere架构说明
+
+|部件|说明|
+|:---|:---|
+|FusionCompute|必选组件，FusionCompute是云操作系统软件，主要负责硬件资源的虚拟化，以及对虚拟资源、业务资源、用户资源的集中管理，它采用虚拟计算、虚拟存储、虚拟网络等技术，完成计算资源、存储资源、网络资源的虚拟化；同时提供统一的接口，对虚拟资源进行集中调度和管理，从而降低业务的运行成本，保证系统的安全性和可靠性，协助运营商和企业构筑安全、绿色、节能的数据中心能力|
+|FusionManager|可选部件，FusionManager主要对云计算的软件和硬件进行全面的监控和管理，实现同构，异构VMware虚拟化多资源池管理，软硬件统一告警监控，并向内部运维人员提供管理门户|
+|eBackup|可选组件，eBackup是虚拟化备份软件，配合FusionCompute快照功能和CBT(Changed Block Tracking)备份功能实现FusionSphere的虚拟机数据备份方案|
+|UltraVR|可选部件，UtrlVR是容灾业务管理软件，利用底层SAN存储系统提供的异步远程复制特性，提供虚拟机关键数据的数据保护和容灾恢复。|
+
 FusionCompute是必选组件，FusionManager、eBackup、UltraVR都是可选组件
 
 FusionSphere应用场景
