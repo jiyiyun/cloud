@@ -55,15 +55,19 @@ OpenStack核心服务简介
 - OpenID Connect 是OpenID和Oauth2的合集
 - SAML Security Assertion Markup Language安全断言标记语言，是一个基于XML的开源标准数据格式，在当事方之间交换身份验证和授权数据，尤其是在身份提供者和服务提供者之间交换。
 
-计算服务Nova 提供大规模、可扩展、按需自助服务的计算资源。nova支持管理裸机、虚拟机和容器。
+操作界面horizon 基于web的控制界面，使云管理员和用户能够管理各种OpenStack资源和服务，依赖的OpenStack服务Keystone
 
-块存储服务Cinder cinder提供块存储服务，为虚拟机提供持久化存储。调用不同的存储接口驱动，将存储设备转化成块存储池，用户无需了解存储实际部署的位置或设备类型。
+glance 提供发现、注册和检索虚拟机镜像功能；提供的虚拟机实例镜像可以存放在不同的地方，例如本地文件系统，对象存储、块存储等。依赖的OpenStack服务Keystone
 
-对象存储服务Swift 提供高度可用、分布式、最终一致的对象存储服务。Swift可以高效、安全且廉价地存储大量数据，非常适合存储需要弹性扩展的非结构化数据。
+计算服务Nova 提供大规模、可扩展、按需自助服务的计算资源。nova支持管理裸机、虚拟机和容器。依赖的OpenStack服务keystone、Neutron、Glance
 
-网络服务Neutron 负责管理虚拟网络组件，专注为OpenStack提供网络即服务。
+块存储服务Cinder cinder提供块存储服务，为虚拟机提供持久化存储。调用不同的存储接口驱动，将存储设备转化成块存储池，用户无需了解存储实际部署的位置或设备类型。依赖的OpenStack服务Keystone
 
-编排服务Heat 为云应用程序排编OpenStack基础架构资源，提供OpenStack原生Rest API和CLoudFormation兼容的查询API
+对象存储服务Swift 提供高度可用、分布式、最终一致的对象存储服务。Swift可以高效、安全且廉价地存储大量数据，非常适合存储需要弹性扩展的非结构化数据。为其它OpenStack服务提供对象存储服务。
+
+网络服务Neutron 负责管理虚拟网络组件，专注为OpenStack提供网络即服务。依赖的OpenStack服务Keystone
+
+编排服务Heat 为云应用程序排编OpenStack基础架构资源，提供OpenStack原生Rest API和CLoudFormation兼容的查询API，依赖的OpenStack服务Keystone
 
 OpenStack服务间交互示例
 ---
