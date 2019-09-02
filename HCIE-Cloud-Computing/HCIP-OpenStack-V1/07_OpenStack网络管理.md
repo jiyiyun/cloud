@@ -28,7 +28,7 @@ OpenStack中使用较多的网络虚拟化技术主要是网卡虚拟化、交�
 Linux网卡虚拟化 - TAP/TUN/VETH
 
 |||Physical NIC|TUN|TAP|Veth Pair|Veth Pair|
-|||:---|:---|:---|:---|:---|
+|:---|:---|:---|:---|:---|:---|:---|
 |||Socket API|Socket API|Socket API|Socket API|Socket API|
 ||||APP|APP|||
 |User Space|||/dev/tunX|/dev/tapX|||
